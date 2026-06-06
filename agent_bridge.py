@@ -12,8 +12,8 @@ SCOPES = ['https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.
 CREDENTIALS_FILE = os.path.join(os.path.dirname(__file__), "google_credentials.json")
 
 # ─── 2. 填入你的 Google 雲端硬碟資料夾 ID ───
-# 請打開網頁版雲端硬碟進入該資料夾，網址最後面那一長串亂碼（例如 1H7x...）就是了！
-FOLDER_ID = "這裡請填入你雲端硬碟資料夾網址最後的那串亂碼"
+# 已經幫你精確換成你指定的資料夾 ID 囉！
+FOLDER_ID = "11nX_m9RDnts6lzl8zycSmIiQPdXe_VNJ"
 
 def get_drive_service():
     if not os.path.exists(CREDENTIALS_FILE):
