@@ -25,7 +25,7 @@ class FilePayload(BaseModel):
     filename: str
     content: str
 
-# ─── 工具 1：透過 API 寫入你真正的雲端硬碟 ───
+# ─── 替換後的工具 1：加上除錯日誌，揪出 500 錯誤 ───
 @app.post("/file/save")
 def save_to_drive(payload: FilePayload):
     try:
@@ -52,6 +52,12 @@ def save_to_drive(payload: FilePayload):
             }
             file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
             message = f"新檔案已成功建立至 Google 雲端硬碟！"
+            
+        return {"status": "success", "message": message, "file_id": file.get('id')}
+    except Exception as e:
+        # 🔥 這行最重要：強迫 Render 把底層的 Google API 報錯印在日誌畫面上
+        print(f"❌ 雲端硬碟寫入失敗！底層原因: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
             
         return {"status": "success", "message": message, "file_id": file.get('id')}
     except Exception as e:
@@ -82,3 +88,9 @@ def read_from_drive(filename: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 # 雲端啟動指令：uvicorn agent_bridge:app --host 0.0.0.0 --port 8000
+# ─── 讓程式碼在最底部主動監聽 Render 的動態連接埠 ───
+if __name__ == "__main__":
+    import uvicorn
+    # 主動讀取 Render 給的環境變數 PORT，讀不到就預設用 10000
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run("agent_bridge:app", host="0.0.0.0", port=port, reload=False)
